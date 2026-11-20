@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>T30 Habit Week — a streak tag rides the chain of walks and falls on a missed day</title>
+<link rel="stylesheet" href="_shared/nocturne.css">
+<link rel="stylesheet" href="../style.css">
+<style>
+  /* the component from source/, dressed in Nocturne type; no grid on the app screen (DESIGN.md R-07) */
+  #stage{background:var(--night);--font:var(--f-text);--display:var(--f-text)}
+  #stage .hw{position:absolute;left:40px;top:50px;zoom:1;z-index:1}
+  body.autoplay #stage :focus-visible{outline:none}
+  body.autoplay #li-cursor{transition:none}   /* visible from frame one, no fade at the loop seam */
+  .hw-wk.li-hover:not([aria-checked="true"]){background:var(--bench);box-shadow:0 0 0 1px rgba(119,218,194,.45) inset}
+  .hw-wk.li-hover .hw-wk-t{color:var(--text)}
+</style>
+</head>
+<body>
+<div id="stage" data-title="T30 Habit Week" data-url="veraetogrex-portfolio.github.io/habit-week">
+  <section class="hw" id="habit" aria-label="Evening walk, one week">
+    <header class="hw-top">
+      <p class="hw-brand"><b>VECTOR</b><span>Habits</span></p>
+      <p class="hw-today"></p>
+    </header>
+
+    <div class="hw-title">
+      <span class="hw-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="13.6" cy="3.8" r="2"/><path d="M12.4 7.6 10.6 14l3 3-.4 4.4M10.6 14l-2.2 3.4-2.6 3.4M12 9.2 8.3 10.8 7.3 14M12 9.2l2.6 2.6 2.9.6"/></svg></span>
+      <div>
+        <h2 class="hw-name">Evening walk</h2>
+        <p class="hw-goal">20 min or more, after dinner</p>
+      </div>
+    </div>
+
+    <!-- seven days; walks on consecutive days are joined by links into one chain -->
+    <div class="hw-week" role="group" aria-label="Days of the week"></div>
+
+    <div class="hw-streak" aria-live="polite">
+      <div class="hw-num"><span class="hw-n"></span><span class="hw-n"></span></div>
+      <p class="hw-unit">day streak</p>
+      <p class="hw-asof"></p>
+    </div>
+
+    <!-- the last four weeks; each one is also the week picker -->
+    <div class="hw-weeks" role="radiogroup" aria-label="Week"></div>
+  </section>
+</div>
+<script>window.AUTOPLAY = true;</script>
+<script src="_shared/stage.js"></script>
+<script src="../script.js"></script>
+<script>
+const hw = document.querySelector('#habit').habit;
+const at = w => { const r = Stage.rect(hw.week(w)); return [r.cx + 30, r.cy - 28]; };   // the cursor rests beside the week label, off its mini week
+Stage.init({
+  reset: () => { hw.reset(); hw.week(3).classList.add('li-hover'); },   // frame one: the cursor already rests on This week
+  get cursorStart() { return at(3); },             // already on "This week" in frame one
+  async demo(s) {
+    const t0 = performance.now();
+    await s.click(at(3), { ms: 40 });                 // pressed from frame one: This week — the chain grows, the tag counts 1…5, falls on Saturday, today starts at 1
+    await s.until(t0, 4700);                           // hold: five joined days, the empty Saturday, today with its own 1
+    await s.click(at(0), { ms: 450 });                // Oct 19–25: a week seen before is drawn in one motion, its tag stands on Sunday at 4
+    await s.until(t0, 5850);
+    await s.move(at(3), 380);                         // back on This week: the loop closes on frame one
+    await s.until(t0, 6280);
+  },
+});
+</script>
+</body>
+</html>

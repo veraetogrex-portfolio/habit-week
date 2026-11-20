@@ -1,0 +1,92 @@
+/* Habit Week — github.com/veraetogrex-portfolio · zero dependencies */
+:root {
+  --night: #07080c; --panel: #0e1016;
+  --path: #121917;             /* a day with no walk yet: dark asphalt, tinted to the accent */
+  --bench: #18201e;            /* raised: streak card, picked week */
+  --curb: #212c28;             /* missed day in the mini weeks */
+  --text: #eef3f1; --text-2: #b6c0bd; --text-3: #8a9592;   /* text-3 on --path 5.8:1 */
+  --line: rgba(255, 255, 255, .08);
+  --walk: #77dac2;             /* a walked day: soft park-light turquoise, oklch(.82 .10 176) */
+  --walk-ink: #072d26;         /* text on a walked day, 8.9:1 */
+  --walk-ink-2: #275147;       /* secondary text on a walked day, 5.4:1 */
+  --miss: rgba(238, 243, 241, .36);   /* the dashed edge of a missed day */
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: var(--font);
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; overflow: hidden; background: var(--night); color: var(--text); font: 16px/1.4 var(--font); }
+p, h2 { margin: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+button:focus-visible { outline: 3px solid var(--walk); outline-offset: 4px; }
+
+.hw { position: relative; width: 1360px; height: 800px; border-radius: 36px; overflow: hidden; user-select: none;
+  background: var(--panel); box-shadow: 0 0 0 1px var(--line) inset, 0 1px 0 rgba(255, 255, 255, .06) inset, 0 80px 140px -50px rgba(0, 0, 0, .8); }
+@media (max-width: 1400px) { .hw { zoom: .8; } }
+@media (max-width: 1100px) { .hw { zoom: .6; } }
+@media (max-width: 820px)  { .hw { zoom: .4; } }
+@media (max-width: 560px)  { .hw { zoom: .27; } }
+
+.hw-top { position: absolute; left: 72px; right: 72px; top: 52px; display: flex; align-items: baseline; justify-content: space-between; }
+.hw-brand { display: flex; align-items: baseline; gap: 14px; }
+.hw-brand b { font: 800 24px var(--font); letter-spacing: .04em; }
+.hw-brand span, .hw-today { font: 600 22px var(--font); color: var(--text-3); }
+
+.hw-title { position: absolute; left: 72px; top: 112px; display: flex; align-items: center; gap: 22px; }
+.hw-ico { width: 76px; height: 76px; border-radius: 22px; display: grid; place-items: center; background: var(--bench); color: var(--walk); }
+.hw-ico svg { width: 44px; height: 44px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hw-name { font: 700 52px/1.05 var(--display); letter-spacing: -.025em; }
+.hw-goal { margin-top: 6px; font: 500 24px var(--font); color: var(--text-2); }
+
+/* ── the week: 7 cells 120×316, gap 12; every layer is placed once, then moved with clip-path, transform or opacity ── */
+.hw-week { position: absolute; left: 72px; top: 236px; width: 912px; height: 316px; }
+.hw-day { position: absolute; top: 0; width: 120px; height: 316px; border-radius: 24px; }
+.hw-day > span { position: absolute; inset: 0; border-radius: 24px; transition: transform .15s ease-out; }
+.hw-day:active > span { transform: scale(.97); }
+.hw-base { z-index: 1; background: var(--path); }
+.hw-base > span { opacity: var(--dim, 1); }
+.hw-hole { z-index: 1; border: 2px dashed var(--miss); opacity: 0; }
+.hw-walks { position: absolute; inset: 0; z-index: 2; pointer-events: none; clip-path: inset(-80px -80px 0 -80px); }   /* a falling tag leaves through the bottom of the week */
+/* the chain is one band: a link carries it across the gap, a day carries it on; it grows to the right */
+.hw-link { position: absolute; top: 0; height: 316px; width: 60px; background: var(--walk); clip-path: inset(0 100% 0 0); }
+.hw-link::after { content: ""; position: absolute; left: 29px; top: 34px; bottom: 34px; width: 2px; border-radius: 1px; background: rgba(7, 45, 38, .14); }   /* the seam between two days of one chain */
+.hw-fill { position: absolute; top: 0; width: 120px; height: 316px; background: var(--walk); color: var(--walk-ink); clip-path: inset(0 100% 0 0 round 24px); }
+
+.hw-dow, .hw-date, .hw-mark, .hw-min { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }
+.hw-dow { top: 16px; font: 600 34px var(--font); color: var(--text-3); }
+.hw-date { top: 60px; font: 700 46px/1 var(--display); letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.hw-mark { top: 114px; height: 100px; display: grid; place-items: center; }
+.hw-mark svg { width: 56px; height: 56px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.hw-socket { position: absolute; left: 22px; top: 126px; width: 76px; height: 76px; border-radius: 50%; border: 2px dashed var(--miss); }   /* where the streak would stand */
+.hw-min { bottom: 20px; font: 600 34px/1.05 var(--font); letter-spacing: -.02em; color: var(--text-3); font-variant-numeric: tabular-nums; }
+.hw-hole .hw-min { color: var(--text-2); font-weight: 700; }
+.hw-fill .hw-dow, .hw-fill .hw-min { color: var(--walk-ink-2); }
+.hw-fill .hw-date { color: var(--walk-ink); }
+.hw-hole .hw-dow, .hw-hole .hw-date { opacity: 0; }   /* the base layer already shows them */
+
+/* the streak tag: rides at the head of the chain and counts its days; with nothing under it, it falls */
+.hw-tag { position: absolute; left: 0; top: 114px; width: 100px; height: 100px; margin-left: 10px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--walk-ink); box-shadow: 0 0 0 5px var(--walk) inset; color: var(--walk); font: 800 52px/1 var(--display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; opacity: 0; }
+.hw-tag.is-lost { box-shadow: 0 0 0 5px var(--text-3) inset; color: var(--text-3); background: var(--path); }
+
+/* ── the streak card: the same number, large ── */
+.hw-streak { position: absolute; left: 1008px; top: 236px; width: 280px; height: 316px; border-radius: 28px; background: var(--bench); text-align: center; }
+.hw-num { position: relative; height: 184px; margin-top: 14px; overflow: hidden; }
+.hw-n { position: absolute; left: 0; right: 0; bottom: 0; font: 700 184px/1 var(--display); letter-spacing: -.05em; font-variant-numeric: tabular-nums; color: var(--walk); }
+.hw-n.is-zero { color: var(--text-3); }
+.hw-unit { margin-top: 4px; font: 600 36px var(--font); }
+.hw-asof { margin-top: 6px; font: 500 34px var(--font); letter-spacing: -.01em; color: var(--text-3); white-space: nowrap; }
+
+/* ── four weeks: label and a small copy of each week ── */
+.hw-weeks { position: absolute; left: 72px; top: 600px; width: 1216px; height: 140px; display: flex; gap: 16px; }
+.hw-wk { position: relative; flex: 1; border-radius: 24px; box-shadow: 0 0 0 1px var(--line) inset; transition: background-color .25s, box-shadow .25s, transform .15s ease-out; }
+.hw-wk:hover:not([aria-checked="true"]) { background: var(--bench); box-shadow: 0 0 0 1px rgba(119, 218, 194, .45) inset; }
+.hw-wk.is-pressed { transform: scale(.97); }
+.hw-wk[aria-checked="true"] { background: var(--bench); box-shadow: 0 0 0 2px var(--walk) inset; }
+.hw-wk-t { position: absolute; left: 24px; top: 20px; font: 600 24px var(--font); color: var(--text-3); white-space: nowrap; transition: color .2s; }
+.hw-wk[aria-checked="true"] .hw-wk-t, .hw-wk:hover .hw-wk-t { color: var(--text); }
+.hw-mini { position: absolute; left: 24px; bottom: 24px; width: 246px; height: 30px; }
+.hw-mini i { position: absolute; top: 0; height: 30px; border-radius: 9px; background: var(--curb); }
+.hw-mini i.is-run { background: var(--walk); opacity: .9; }
+
+.hw.is-reset, .hw.is-reset * { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .hw-day > span, .hw-wk, .hw-wk-t { transition-duration: 1ms; } }
